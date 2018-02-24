@@ -1,0 +1,12 @@
+example_users: 
+- name: juan 
+  shell: /bin/bash
+  email: yyy@example.com 
+  groups: sudo
+  servers: [ saas ]
+
+- name: jyoti 
+  shell: /bin/bash
+  email: xxxx@example.com
+  groups: sudo
+  servers: [ saas ]

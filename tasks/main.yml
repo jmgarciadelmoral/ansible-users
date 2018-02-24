@@ -1,0 +1,31 @@
+- name: Add groups
+  group:
+   name: '{{item}}'
+  with_items: 
+  - sudo
+  - sftponly   
+
+- name: "Allow {{sudo_group}} to have passwordless sudo"
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%{{sudo_group}}'
+    line: '%{{sudo_group}} ALL=(ALL) NOPASSWD: ALL'
+
+- name: Add/Remove users
+  user:
+    name:   '{{item.name}}'
+    groups: '{{item.groups|default("")}}'
+    append: yes
+    state:  "{{item.state | default('present') }}"
+  with_items: "{{users}}"
+  when: item.servers is undefined or inventory_hostname in item.servers
+ 
+- name: Configure authorized_keys
+  authorized_key:
+    user: "{{item.name}}"
+    state: present
+    exclusive: true
+    key: "{{ lookup('file', 'files/ssh_keys/' + item.name + '.pub') }}"
+  with_items: "{{users}}"
+  when: item.servers is undefined or inventory_hostname in item.servers
